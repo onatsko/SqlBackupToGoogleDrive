@@ -1,4 +1,7 @@
-﻿namespace SqlBackupToGoogleDrive
+﻿using System;
+using System.IO;
+
+namespace SqlBackupToGoogleDrive
 {
     public class SqlBackupToGoogleDrive
     {
@@ -18,5 +21,21 @@
         {
             return new SendResult(false, "need to do");
         }
+
+
+
+
+
+        static void Main(string[] args)
+        {
+            var fi = new FileInfo(@"e:\Nau\Work\PDAA\DB_Arhive\PDAA_2020-06-16_15-20.bak");
+
+            var service = new File2GDrive();
+            service.CreateFolder("!test!");
+            //service.UploadFile(fi);
+
+            Console.ReadLine();
+        }
+
     }
 }
