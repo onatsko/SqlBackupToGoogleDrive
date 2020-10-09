@@ -1,38 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using Google.Apis.Auth.OAuth2;
+﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Upload;
 using Google.Apis.Util.Store;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using File = Google.Apis.Drive.v3.Data.File;
 
-namespace SqlBackupToGoogleDrive
+namespace File2GDrive
 {
     public class File2GDrive
     {
-        // If modifying these scopes, delete your previously saved credentials
-        // at ~/.credentials/drive-dotnet-quickstart.json
-        static string[] Scopes = { DriveService.Scope.DriveFile };
-        static string ApplicationName = "File2GDrive";
+        private const string FolderMimeType = "application/vnd.google-apps.folder";
 
+
+        private readonly string[] scopes = { DriveService.Scope.DriveFile };
+        private readonly string applicationName = "File2GDrive";
         private readonly DriveService service;
-        private readonly UserCredential credential;
+
         public File2GDrive()
         {
+            UserCredential credential;
+
             using (var stream =
-                new FileStream("GDriveCredentials.json", FileMode.Open, FileAccess.Read))
+                new FileStream("Credentials/GDriveCredentials.json", FileMode.Open, FileAccess.Read))
             {
                 // The file token.json stores the user's access and refresh tokens, and is created
                 // automatically when the authorization flow completes for the first time.
                 string credPath = "token.json";
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
+                    scopes,
                     "user",
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
@@ -43,56 +44,152 @@ namespace SqlBackupToGoogleDrive
             service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
+                ApplicationName = applicationName,
             });
         }
 
-        public void GetFilesList()
+        public List<File> GetFiles()
         {
-            // Define parameters of request.
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 10;
-            listRequest.Fields = "nextPageToken, files(id, name)";
+            var result = new List<File>();
 
-            // List files.
-            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-                .Files;
-            Console.WriteLine("Files:");
-            if (files != null && files.Count > 0)
+            string pageToken = null;
+            while (true)
             {
-                foreach (var file in files)
+                FilesResource.ListRequest listRequest = service.Files.List();
+                listRequest.PageSize = 10;
+                listRequest.PageToken = pageToken;
+                listRequest.Fields = "nextPageToken, files(id, name, mimeType, size)";
+
+                var fileList = listRequest.Execute();
+
+                // List files.
+                IList<File> folders = fileList.Files;
+                if (folders != null && folders.Count > 0)
                 {
-                    Console.WriteLine("{0} ({1})", file.Name, file.Id);
+                    result.AddRange(folders.Where(x => !x.MimeType.Equals(FolderMimeType, StringComparison.InvariantCultureIgnoreCase)));
                 }
+
+                pageToken = fileList.NextPageToken;
+                if (pageToken == null)
+                    break;
             }
-            else
+
+            return result;
+        }
+
+        public List<File> GetFolders()
+        {
+            var result = new List<File>();
+
+            string pageToken = null;
+            while (true)
             {
-                Console.WriteLine("No files found.");
+                FilesResource.ListRequest listRequest = service.Files.List();
+                listRequest.PageSize = 10;
+                listRequest.PageToken = pageToken;
+                listRequest.Fields = "nextPageToken, files(id, name, mimeType, size)";
+
+                var fileList = listRequest.Execute();
+
+                // List files.
+                IList<File> folders = fileList.Files;
+                if (folders != null && folders.Count > 0)
+                {
+                    result.AddRange(folders.Where(x => x.MimeType.Equals(FolderMimeType, StringComparison.InvariantCultureIgnoreCase)));
+                }
+
+                pageToken = fileList.NextPageToken;
+                if (pageToken == null)
+                    break;
             }
+
+            return result;
         }
 
-        public void CreateFolder(string folderName)
+        /// <summary>
+        /// If folder with param name exists, return FolderId of exists folder.
+        /// Or create new folder
+        /// </summary>
+        /// <param name="folderName">Folder name</param>
+        /// <returns>Folder.Id</returns>
+        public string CreateOrGetFolder(string folderName)
         {
-            File body = new File();
-            body.Name = folderName;
-            body.MimeType = "application/vnd.google-apps.folder";
+            var existingFolders = GetFolders();
+            foreach (var folder in existingFolders)
+            {
+                if (folder.Name == folderName)
+                    return folder.Id;
+            }
 
-            service.Files.Create(body).Execute();
+            var body = new File
+            {
+                Name = folderName, 
+                MimeType = FolderMimeType
+            };
+
+            var createdFolder = service
+                .Files
+                .Create(body)
+                .Execute();
+
+            return createdFolder.Id;
         }
 
-        public void UploadFile(FileInfo file)
+        /// <summary>
+        /// Forced create new folder
+        /// </summary>
+        /// <param name="folderName">Folder name</param>
+        /// <returns>FolderId</returns>
+        public string CreateForceFolder(string folderName)
         {
+            var body = new File
+            {
+                Name = folderName,
+                MimeType = "application/vnd.google-apps.folder"
+            };
+
+            var folder = service
+                .Files
+                .Create(body)
+                .Execute();
+
+            return folder.Id;
+        }
+
+        private bool IsFolderIdExists(string folderId)
+        {
+            var existingFolders = GetFolders();
+
+            if (existingFolders.Select(x => x.Id).Contains(folderId))
+                return true;
+
+            return false;
+        }
+
+        public UploadFileResult UploadFile(string file, string folderId = null)
+        {
+            var fi = new FileInfo(file);
             var fileMetadata = new File()
             {
-                Name = file.Name,
+                Name = fi.Name,
                 MimeType = "application/octet-stream"
             };
-            FilesResource.CreateMediaUpload request;
-            using (var stream = new System.IO.FileStream(file.FullName,
-                System.IO.FileMode.Open))
+
+            //if folderId is specified, try to find folder and set
+            if (!string.IsNullOrEmpty(folderId))
             {
-                request = service.Files.Create(
-                    fileMetadata, stream, "*/*");
+                if (!IsFolderIdExists(folderId))
+                {
+                    //throw new ArgumentException($"Folder with Id '{folderId}' is absent");
+                    return new UploadFileResult(false, "", $"Folder with Id '{folderId}' is absent");
+                }
+
+                fileMetadata.Parents = new List<string>() {folderId};
+            }
+
+            using (var stream = new FileStream(fi.FullName, FileMode.Open))
+            {
+                var request = service.Files.Create(fileMetadata, stream, "*/*");
                 request.Fields = "id";
 
                 // Add handlers which will be notified on progress changes and upload completion.
@@ -101,11 +198,20 @@ namespace SqlBackupToGoogleDrive
                 request.ProgressChanged += Upload_ProgressChanged;
                 request.ResponseReceived += Upload_ResponseReceived;
 
-                var xx = request.Upload();
+                var progress = request.Upload();
+                if (progress.Status == UploadStatus.Completed)
+                {
+                    var fileResult = request.ResponseBody;
+                    //if (fileResult != null)
+                    //    Console.WriteLine("File ID: " + fileResult.Id);
+
+                    return new UploadFileResult(true, fileResult.Id, "");
+                }
+                else
+                {
+                    return new UploadFileResult(false, "", $"Status: {progress.Status}, Exception: {progress.Exception}");
+                }
             }
-            var fileResult = request.ResponseBody;
-            if (fileResult!=null)
-                Console.WriteLine("File ID: " + fileResult.Id);
         }
 
         void Upload_ProgressChanged(IUploadProgress progress)
