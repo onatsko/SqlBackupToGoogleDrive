@@ -55,7 +55,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtConServer = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tbpSchedule = new System.Windows.Forms.TabPage();
             this.btnGoogleAuthorize = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dgvJobList)).BeginInit();
@@ -122,7 +122,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tpJobDetail);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tbpSchedule);
             this.tabControl1.Location = new System.Drawing.Point(351, 52);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -280,7 +280,6 @@
             this.txtConPassword.PasswordChar = '*';
             this.txtConPassword.Size = new System.Drawing.Size(190, 23);
             this.txtConPassword.TabIndex = 6;
-            this.txtConPassword.Text = "editec";
             // 
             // label4
             // 
@@ -318,7 +317,6 @@
             this.txtConDatabase.Name = "txtConDatabase";
             this.txtConDatabase.Size = new System.Drawing.Size(190, 23);
             this.txtConDatabase.TabIndex = 2;
-            this.txtConDatabase.Text = "pdaa";
             // 
             // label2
             // 
@@ -348,15 +346,15 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Server";
             // 
-            // tabPage2
+            // tbpSchedule
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(627, 424);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tbpSchedule.Location = new System.Drawing.Point(4, 24);
+            this.tbpSchedule.Name = "tbpSchedule";
+            this.tbpSchedule.Padding = new System.Windows.Forms.Padding(3);
+            this.tbpSchedule.Size = new System.Drawing.Size(627, 424);
+            this.tbpSchedule.TabIndex = 1;
+            this.tbpSchedule.Text = "Schedule";
+            this.tbpSchedule.UseVisualStyleBackColor = true;
             // 
             // btnGoogleAuthorize
             // 
@@ -402,7 +400,7 @@
         private System.Windows.Forms.ToolStripButton tsbJobDelete;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tpJobDetail;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tbpSchedule;
         private System.Windows.Forms.GroupBox grbConnection;
         private System.Windows.Forms.Button btnConTest;
         private System.Windows.Forms.RadioButton rdbConAuthWin;
