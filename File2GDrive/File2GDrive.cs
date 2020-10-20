@@ -15,11 +15,19 @@ namespace File2GDrive
     public class File2GDrive
     {
         private const string FolderMimeType = "application/vnd.google-apps.folder";
-
-
         private readonly string[] scopes = { DriveService.Scope.DriveFile };
         private readonly string applicationName = "File2GDrive";
         private readonly DriveService service;
+        private long uploadingFileBytesAll = 0;
+
+
+        public delegate void UploadFileProgressHandler(string status, long bytesSent, long bytesAll, int uploadingPercent);
+        public event UploadFileProgressHandler UploadFileProgressChanged;
+
+        public delegate void UploadFileCompletedHandler(string fileId);
+        public event UploadFileCompletedHandler UploadFileCompleted;
+
+
 
         public File2GDrive()
         {
@@ -156,19 +164,12 @@ namespace File2GDrive
             return folder.Id;
         }
 
-        private bool IsFolderIdExists(string folderId)
-        {
-            var existingFolders = GetFolders();
-
-            if (existingFolders.Select(x => x.Id).Contains(folderId))
-                return true;
-
-            return false;
-        }
-
         public UploadFileResult UploadFile(string file, string folderId = null)
         {
             var fi = new FileInfo(file);
+
+            uploadingFileBytesAll = fi.Length;
+
             var fileMetadata = new File()
             {
                 Name = fi.Name,
@@ -180,7 +181,6 @@ namespace File2GDrive
             {
                 if (!IsFolderIdExists(folderId))
                 {
-                    //throw new ArgumentException($"Folder with Id '{folderId}' is absent");
                     return new UploadFileResult(false, "", $"Folder with Id '{folderId}' is absent");
                 }
 
@@ -199,29 +199,39 @@ namespace File2GDrive
                 request.ResponseReceived += Upload_ResponseReceived;
 
                 var progress = request.Upload();
+
+                uploadingFileBytesAll = 0;
+
                 if (progress.Status == UploadStatus.Completed)
                 {
                     var fileResult = request.ResponseBody;
-                    //if (fileResult != null)
-                    //    Console.WriteLine("File ID: " + fileResult.Id);
-
                     return new UploadFileResult(true, fileResult.Id, "");
                 }
-                else
-                {
-                    return new UploadFileResult(false, "", $"Status: {progress.Status}, Exception: {progress.Exception}");
-                }
+
+                return new UploadFileResult(false, "", $"Status: {progress.Status}, Exception: {progress.Exception}");
             }
         }
 
-        void Upload_ProgressChanged(IUploadProgress progress)
+        private void Upload_ProgressChanged(IUploadProgress progress)
         {
-            Console.WriteLine(progress.Status + " " + progress.BytesSent);
+            var uploadingPercent = (int)(progress.BytesSent * 100 / uploadingFileBytesAll);
+            UploadFileProgressChanged?.Invoke(progress.Status.ToString(), progress.BytesSent, uploadingFileBytesAll, uploadingPercent);   
         }
 
-        void Upload_ResponseReceived(Google.Apis.Drive.v3.Data.File file)
+        private void Upload_ResponseReceived(File file)
         {
-            Console.WriteLine(file.Name + " was uploaded successfully");
+            UploadFileCompleted?.Invoke(file.Id);
         }
+
+        private bool IsFolderIdExists(string folderId)
+        {
+            var existingFolders = GetFolders();
+
+            if (existingFolders.Select(x => x.Id).Contains(folderId))
+                return true;
+
+            return false;
+        }
+
     }
 }

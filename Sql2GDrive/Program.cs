@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Sql2GDrive
@@ -19,5 +16,8 @@ namespace Sql2GDrive
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FrmMain());
         }
+
+        public const string AppName = "Sql2GoogleDrive";
+
     }
 }
