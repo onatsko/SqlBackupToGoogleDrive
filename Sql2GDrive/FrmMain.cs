@@ -6,8 +6,10 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Sql2GoogleDrive.DAL.TaskContext;
 
 namespace Sql2GDrive
 {
@@ -17,6 +19,29 @@ namespace Sql2GDrive
         public FrmMain()
         {
             InitializeComponent();
+
+            GetJobs();
+
+        }
+
+        private void GetJobs()
+        {
+            using (var db = new JobContext())
+            {
+                var jobs = db.Jobs.Where(x => x.JobId > 0);
+            }
+        }
+
+        private void tsbJobAdd_Click(object sender, EventArgs e)
+        {
+            using (var db = new JobContext())
+            {
+                var job = new Job();
+                job.Connection = new Connection();
+                job.Schedule = new Schedule();
+                db.Jobs.Add(job);
+                db.SaveChanges();
+            }
         }
 
         private string GetGoogleAccountCredentialsFolder()
@@ -204,6 +229,7 @@ namespace Sql2GDrive
                 btnFolderSelect.Enabled = false;
             }
         }
+
     }
 
 

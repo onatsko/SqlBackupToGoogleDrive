@@ -97,6 +97,7 @@
             this.tsbJobAdd.Name = "tsbJobAdd";
             this.tsbJobAdd.Size = new System.Drawing.Size(23, 22);
             this.tsbJobAdd.Text = "Add";
+            this.tsbJobAdd.Click += new System.EventHandler(this.tsbJobAdd_Click);
             // 
             // tsbJobEdit
             // 
