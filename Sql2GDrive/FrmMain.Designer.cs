@@ -34,15 +34,16 @@
             this.tsbJobAdd = new System.Windows.Forms.ToolStripButton();
             this.tsbJobEdit = new System.Windows.Forms.ToolStripButton();
             this.tsbJobDelete = new System.Windows.Forms.ToolStripButton();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tpJobDetail = new System.Windows.Forms.TabPage();
-            this.btnCreateBackupOnly = new System.Windows.Forms.Button();
+            this.btnGoogleAuthorize = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.btnBackupOnly = new System.Windows.Forms.Button();
             this.chbSaveToFolder = new System.Windows.Forms.CheckBox();
             this.btnBackupAndUpload = new System.Windows.Forms.Button();
             this.btnFolderSelect = new System.Windows.Forms.Button();
             this.txtFolder = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.grbConnection = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.btnConTest = new System.Windows.Forms.Button();
             this.rdbConAuthWin = new System.Windows.Forms.RadioButton();
             this.rdbConAuthSql = new System.Windows.Forms.RadioButton();
@@ -54,15 +55,31 @@
             this.txtConDatabase = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtConServer = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.tbpSchedule = new System.Windows.Forms.TabPage();
-            this.btnGoogleAuthorize = new System.Windows.Forms.Button();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.grbSchedule = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.btnRunTimeDelete = new System.Windows.Forms.Button();
+            this.dgvRunTime = new System.Windows.Forms.DataGridView();
+            this.dtpRunTime = new System.Windows.Forms.DateTimePicker();
+            this.btnRunTimeAdd = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.chbSunday = new System.Windows.Forms.CheckBox();
+            this.chbSaturday = new System.Windows.Forms.CheckBox();
+            this.chbFriday = new System.Windows.Forms.CheckBox();
+            this.chbThursday = new System.Windows.Forms.CheckBox();
+            this.chbWednesday = new System.Windows.Forms.CheckBox();
+            this.chbTuesday = new System.Windows.Forms.CheckBox();
+            this.chbMonday = new System.Windows.Forms.CheckBox();
+            this.rdbAutorunModeNone = new System.Windows.Forms.RadioButton();
+            this.rdbAutorunModeAuto = new System.Windows.Forms.RadioButton();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.txtJobName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvJobList)).BeginInit();
             this.toolStrip1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tpJobDetail.SuspendLayout();
             this.grbConnection.SuspendLayout();
+            this.grbSchedule.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRunTime)).BeginInit();
             this.SuspendLayout();
             // 
             // dgvJobList
@@ -72,9 +89,10 @@
             this.dgvJobList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvJobList.Location = new System.Drawing.Point(12, 80);
             this.dgvJobList.Name = "dgvJobList";
-            this.dgvJobList.Size = new System.Drawing.Size(333, 424);
+            this.dgvJobList.Size = new System.Drawing.Size(333, 389);
             this.dgvJobList.TabIndex = 0;
             this.dgvJobList.Text = "dataGridView1";
+            this.dgvJobList.SelectionChanged += new System.EventHandler(this.dgvJobList_SelectionChanged);
             // 
             // toolStrip1
             // 
@@ -117,50 +135,33 @@
             this.tsbJobDelete.Size = new System.Drawing.Size(23, 22);
             this.tsbJobDelete.Text = "Delete";
             // 
-            // tabControl1
+            // btnGoogleAuthorize
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnGoogleAuthorize.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnGoogleAuthorize.Location = new System.Drawing.Point(12, 12);
+            this.btnGoogleAuthorize.Name = "btnGoogleAuthorize";
+            this.btnGoogleAuthorize.Size = new System.Drawing.Size(333, 23);
+            this.btnGoogleAuthorize.TabIndex = 3;
+            this.btnGoogleAuthorize.Text = "Authorize in Google account";
+            this.btnGoogleAuthorize.UseVisualStyleBackColor = true;
+            this.btnGoogleAuthorize.Click += new System.EventHandler(this.btnGoogleAuthorize_Click);
+            // 
+            // btnBackupOnly
+            // 
+            this.btnBackupOnly.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl1.Controls.Add(this.tpJobDetail);
-            this.tabControl1.Controls.Add(this.tbpSchedule);
-            this.tabControl1.Location = new System.Drawing.Point(351, 52);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(635, 452);
-            this.tabControl1.TabIndex = 2;
-            // 
-            // tpJobDetail
-            // 
-            this.tpJobDetail.Controls.Add(this.btnCreateBackupOnly);
-            this.tpJobDetail.Controls.Add(this.chbSaveToFolder);
-            this.tpJobDetail.Controls.Add(this.btnBackupAndUpload);
-            this.tpJobDetail.Controls.Add(this.btnFolderSelect);
-            this.tpJobDetail.Controls.Add(this.txtFolder);
-            this.tpJobDetail.Controls.Add(this.label6);
-            this.tpJobDetail.Controls.Add(this.grbConnection);
-            this.tpJobDetail.Location = new System.Drawing.Point(4, 24);
-            this.tpJobDetail.Name = "tpJobDetail";
-            this.tpJobDetail.Padding = new System.Windows.Forms.Padding(3);
-            this.tpJobDetail.Size = new System.Drawing.Size(627, 424);
-            this.tpJobDetail.TabIndex = 0;
-            this.tpJobDetail.Text = "Job details";
-            this.tpJobDetail.UseVisualStyleBackColor = true;
-            // 
-            // btnCreateBackupOnly
-            // 
-            this.btnCreateBackupOnly.Location = new System.Drawing.Point(56, 304);
-            this.btnCreateBackupOnly.Name = "btnCreateBackupOnly";
-            this.btnCreateBackupOnly.Size = new System.Drawing.Size(235, 23);
-            this.btnCreateBackupOnly.TabIndex = 14;
-            this.btnCreateBackupOnly.Text = "Create backup only";
-            this.btnCreateBackupOnly.UseVisualStyleBackColor = true;
-            this.btnCreateBackupOnly.Click += new System.EventHandler(this.btnBackupOnly_Click);
+            this.btnBackupOnly.Location = new System.Drawing.Point(351, 446);
+            this.btnBackupOnly.Name = "btnBackupOnly";
+            this.btnBackupOnly.Size = new System.Drawing.Size(638, 23);
+            this.btnBackupOnly.TabIndex = 14;
+            this.btnBackupOnly.Text = "Create backup only to folder";
+            this.btnBackupOnly.UseVisualStyleBackColor = true;
+            this.btnBackupOnly.Click += new System.EventHandler(this.btnBackupOnly_Click);
             // 
             // chbSaveToFolder
             // 
             this.chbSaveToFolder.AutoSize = true;
-            this.chbSaveToFolder.Location = new System.Drawing.Point(3, 210);
+            this.chbSaveToFolder.Location = new System.Drawing.Point(351, 315);
             this.chbSaveToFolder.Name = "chbSaveToFolder";
             this.chbSaveToFolder.Size = new System.Drawing.Size(139, 19);
             this.chbSaveToFolder.TabIndex = 13;
@@ -170,9 +171,11 @@
             // 
             // btnBackupAndUpload
             // 
-            this.btnBackupAndUpload.Location = new System.Drawing.Point(56, 264);
+            this.btnBackupAndUpload.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBackupAndUpload.Location = new System.Drawing.Point(351, 417);
             this.btnBackupAndUpload.Name = "btnBackupAndUpload";
-            this.btnBackupAndUpload.Size = new System.Drawing.Size(235, 23);
+            this.btnBackupAndUpload.Size = new System.Drawing.Size(638, 23);
             this.btnBackupAndUpload.TabIndex = 12;
             this.btnBackupAndUpload.Text = "Create backup && Upload to Google Drive";
             this.btnBackupAndUpload.UseVisualStyleBackColor = true;
@@ -181,33 +184,34 @@
             // btnFolderSelect
             // 
             this.btnFolderSelect.Enabled = false;
-            this.btnFolderSelect.Image = ((System.Drawing.Image)(resources.GetObject("btnFolderSelect.Image")));
-            this.btnFolderSelect.Location = new System.Drawing.Point(263, 234);
+            this.btnFolderSelect.Location = new System.Drawing.Point(632, 339);
             this.btnFolderSelect.Name = "btnFolderSelect";
             this.btnFolderSelect.Size = new System.Drawing.Size(28, 23);
             this.btnFolderSelect.TabIndex = 11;
+            this.btnFolderSelect.Text = "...";
             this.btnFolderSelect.UseVisualStyleBackColor = true;
             this.btnFolderSelect.Click += new System.EventHandler(this.btnFIleSelect_Click);
             // 
             // txtFolder
             // 
             this.txtFolder.Enabled = false;
-            this.txtFolder.Location = new System.Drawing.Point(56, 235);
+            this.txtFolder.Location = new System.Drawing.Point(374, 340);
             this.txtFolder.Name = "txtFolder";
-            this.txtFolder.Size = new System.Drawing.Size(201, 23);
+            this.txtFolder.Size = new System.Drawing.Size(252, 23);
             this.txtFolder.TabIndex = 10;
             // 
-            // label6
+            // label1
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 238);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(40, 15);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "Folder";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 238);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 15);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Folder";
             // 
             // grbConnection
             // 
+            this.grbConnection.Controls.Add(this.label11);
             this.grbConnection.Controls.Add(this.btnConTest);
             this.grbConnection.Controls.Add(this.rdbConAuthWin);
             this.grbConnection.Controls.Add(this.rdbConAuthSql);
@@ -220,12 +224,21 @@
             this.grbConnection.Controls.Add(this.label2);
             this.grbConnection.Controls.Add(this.txtConServer);
             this.grbConnection.Controls.Add(this.label1);
-            this.grbConnection.Location = new System.Drawing.Point(3, 4);
+            this.grbConnection.Location = new System.Drawing.Point(351, 109);
             this.grbConnection.Name = "grbConnection";
-            this.grbConnection.Size = new System.Drawing.Size(294, 200);
+            this.grbConnection.Size = new System.Drawing.Size(315, 200);
             this.grbConnection.TabIndex = 0;
             this.grbConnection.TabStop = false;
             this.grbConnection.Text = "Connection";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 25);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(39, 15);
+            this.label11.TabIndex = 10;
+            this.label11.Text = "Server";
             // 
             // btnConTest
             // 
@@ -233,7 +246,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnConTest.Location = new System.Drawing.Point(98, 163);
             this.btnConTest.Name = "btnConTest";
-            this.btnConTest.Size = new System.Drawing.Size(190, 23);
+            this.btnConTest.Size = new System.Drawing.Size(211, 23);
             this.btnConTest.TabIndex = 7;
             this.btnConTest.Text = "Test connection";
             this.btnConTest.UseVisualStyleBackColor = true;
@@ -279,7 +292,7 @@
             this.txtConPassword.Location = new System.Drawing.Point(98, 134);
             this.txtConPassword.Name = "txtConPassword";
             this.txtConPassword.PasswordChar = '*';
-            this.txtConPassword.Size = new System.Drawing.Size(190, 23);
+            this.txtConPassword.Size = new System.Drawing.Size(211, 23);
             this.txtConPassword.TabIndex = 6;
             // 
             // label4
@@ -297,7 +310,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConLogin.Location = new System.Drawing.Point(98, 105);
             this.txtConLogin.Name = "txtConLogin";
-            this.txtConLogin.Size = new System.Drawing.Size(190, 23);
+            this.txtConLogin.Size = new System.Drawing.Size(211, 23);
             this.txtConLogin.TabIndex = 5;
             this.txtConLogin.Text = "sa";
             // 
@@ -316,7 +329,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConDatabase.Location = new System.Drawing.Point(98, 51);
             this.txtConDatabase.Name = "txtConDatabase";
-            this.txtConDatabase.Size = new System.Drawing.Size(190, 23);
+            this.txtConDatabase.Size = new System.Drawing.Size(211, 23);
             this.txtConDatabase.TabIndex = 2;
             // 
             // label2
@@ -334,59 +347,256 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConServer.Location = new System.Drawing.Point(98, 22);
             this.txtConServer.Name = "txtConServer";
-            this.txtConServer.Size = new System.Drawing.Size(190, 23);
+            this.txtConServer.Size = new System.Drawing.Size(211, 23);
             this.txtConServer.TabIndex = 1;
             this.txtConServer.Text = "localhost";
             // 
-            // label1
+            // grbSchedule
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Server";
+            this.grbSchedule.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grbSchedule.Controls.Add(this.label7);
+            this.grbSchedule.Controls.Add(this.btnRunTimeDelete);
+            this.grbSchedule.Controls.Add(this.dgvRunTime);
+            this.grbSchedule.Controls.Add(this.dtpRunTime);
+            this.grbSchedule.Controls.Add(this.btnRunTimeAdd);
+            this.grbSchedule.Controls.Add(this.label6);
+            this.grbSchedule.Controls.Add(this.chbSunday);
+            this.grbSchedule.Controls.Add(this.chbSaturday);
+            this.grbSchedule.Controls.Add(this.chbFriday);
+            this.grbSchedule.Controls.Add(this.chbThursday);
+            this.grbSchedule.Controls.Add(this.chbWednesday);
+            this.grbSchedule.Controls.Add(this.chbTuesday);
+            this.grbSchedule.Controls.Add(this.chbMonday);
+            this.grbSchedule.Controls.Add(this.rdbAutorunModeNone);
+            this.grbSchedule.Controls.Add(this.rdbAutorunModeAuto);
+            this.grbSchedule.Location = new System.Drawing.Point(672, 109);
+            this.grbSchedule.Name = "grbSchedule";
+            this.grbSchedule.Size = new System.Drawing.Size(325, 254);
+            this.grbSchedule.TabIndex = 15;
+            this.grbSchedule.TabStop = false;
+            this.grbSchedule.Text = "Autorun schedule";
             // 
-            // tbpSchedule
+            // label7
             // 
-            this.tbpSchedule.Location = new System.Drawing.Point(4, 24);
-            this.tbpSchedule.Name = "tbpSchedule";
-            this.tbpSchedule.Padding = new System.Windows.Forms.Padding(3);
-            this.tbpSchedule.Size = new System.Drawing.Size(627, 424);
-            this.tbpSchedule.TabIndex = 1;
-            this.tbpSchedule.Text = "Schedule";
-            this.tbpSchedule.UseVisualStyleBackColor = true;
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(32, 53);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(67, 15);
+            this.label7.TabIndex = 4;
+            this.label7.Text = "Day to start";
             // 
-            // btnGoogleAuthorize
+            // btnRunTimeDelete
             // 
-            this.btnGoogleAuthorize.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnGoogleAuthorize.Location = new System.Drawing.Point(12, 12);
-            this.btnGoogleAuthorize.Name = "btnGoogleAuthorize";
-            this.btnGoogleAuthorize.Size = new System.Drawing.Size(333, 23);
-            this.btnGoogleAuthorize.TabIndex = 3;
-            this.btnGoogleAuthorize.Text = "Выбрать Google аккаунт";
-            this.btnGoogleAuthorize.UseVisualStyleBackColor = true;
-            this.btnGoogleAuthorize.Click += new System.EventHandler(this.btnGoogleAuthorize_Click);
+            this.btnRunTimeDelete.Location = new System.Drawing.Point(220, 186);
+            this.btnRunTimeDelete.Name = "btnRunTimeDelete";
+            this.btnRunTimeDelete.Size = new System.Drawing.Size(94, 23);
+            this.btnRunTimeDelete.TabIndex = 8;
+            this.btnRunTimeDelete.Text = "Delete selected";
+            this.btnRunTimeDelete.UseVisualStyleBackColor = true;
+            // 
+            // dgvRunTime
+            // 
+            this.dgvRunTime.AllowUserToAddRows = false;
+            this.dgvRunTime.AllowUserToDeleteRows = false;
+            this.dgvRunTime.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvRunTime.Location = new System.Drawing.Point(141, 71);
+            this.dgvRunTime.Name = "dgvRunTime";
+            this.dgvRunTime.ReadOnly = true;
+            this.dgvRunTime.Size = new System.Drawing.Size(73, 138);
+            this.dgvRunTime.TabIndex = 7;
+            this.dgvRunTime.Text = "dataGridView1";
+            // 
+            // dtpRunTime
+            // 
+            this.dtpRunTime.CustomFormat = "HH:mm";
+            this.dtpRunTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtpRunTime.Location = new System.Drawing.Point(141, 215);
+            this.dtpRunTime.Name = "dtpRunTime";
+            this.dtpRunTime.Size = new System.Drawing.Size(73, 23);
+            this.dtpRunTime.TabIndex = 6;
+            // 
+            // btnRunTimeAdd
+            // 
+            this.btnRunTimeAdd.Location = new System.Drawing.Point(220, 215);
+            this.btnRunTimeAdd.Name = "btnRunTimeAdd";
+            this.btnRunTimeAdd.Size = new System.Drawing.Size(94, 23);
+            this.btnRunTimeAdd.TabIndex = 5;
+            this.btnRunTimeAdd.Text = "Add time";
+            this.btnRunTimeAdd.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(142, 53);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(73, 15);
+            this.label6.TabIndex = 4;
+            this.label6.Text = "Time to start";
+            // 
+            // chbSunday
+            // 
+            this.chbSunday.AutoSize = true;
+            this.chbSunday.Location = new System.Drawing.Point(32, 219);
+            this.chbSunday.Name = "chbSunday";
+            this.chbSunday.Size = new System.Drawing.Size(65, 19);
+            this.chbSunday.TabIndex = 2;
+            this.chbSunday.Text = "Sunday";
+            this.chbSunday.UseVisualStyleBackColor = true;
+            // 
+            // chbSaturday
+            // 
+            this.chbSaturday.AutoSize = true;
+            this.chbSaturday.Location = new System.Drawing.Point(32, 194);
+            this.chbSaturday.Name = "chbSaturday";
+            this.chbSaturday.Size = new System.Drawing.Size(72, 19);
+            this.chbSaturday.TabIndex = 2;
+            this.chbSaturday.Text = "Saturday";
+            this.chbSaturday.UseVisualStyleBackColor = true;
+            // 
+            // chbFriday
+            // 
+            this.chbFriday.AutoSize = true;
+            this.chbFriday.Location = new System.Drawing.Point(32, 169);
+            this.chbFriday.Name = "chbFriday";
+            this.chbFriday.Size = new System.Drawing.Size(58, 19);
+            this.chbFriday.TabIndex = 2;
+            this.chbFriday.Text = "Friday";
+            this.chbFriday.UseVisualStyleBackColor = true;
+            // 
+            // chbThursday
+            // 
+            this.chbThursday.AutoSize = true;
+            this.chbThursday.Location = new System.Drawing.Point(32, 144);
+            this.chbThursday.Name = "chbThursday";
+            this.chbThursday.Size = new System.Drawing.Size(74, 19);
+            this.chbThursday.TabIndex = 2;
+            this.chbThursday.Text = "Thursday";
+            this.chbThursday.UseVisualStyleBackColor = true;
+            // 
+            // chbWednesday
+            // 
+            this.chbWednesday.AutoSize = true;
+            this.chbWednesday.Location = new System.Drawing.Point(32, 119);
+            this.chbWednesday.Name = "chbWednesday";
+            this.chbWednesday.Size = new System.Drawing.Size(87, 19);
+            this.chbWednesday.TabIndex = 2;
+            this.chbWednesday.Text = "Wednesday";
+            this.chbWednesday.UseVisualStyleBackColor = true;
+            // 
+            // chbTuesday
+            // 
+            this.chbTuesday.AutoSize = true;
+            this.chbTuesday.Location = new System.Drawing.Point(32, 94);
+            this.chbTuesday.Name = "chbTuesday";
+            this.chbTuesday.Size = new System.Drawing.Size(69, 19);
+            this.chbTuesday.TabIndex = 2;
+            this.chbTuesday.Text = "Tuesday";
+            this.chbTuesday.UseVisualStyleBackColor = true;
+            // 
+            // chbMonday
+            // 
+            this.chbMonday.AutoSize = true;
+            this.chbMonday.Location = new System.Drawing.Point(32, 71);
+            this.chbMonday.Name = "chbMonday";
+            this.chbMonday.Size = new System.Drawing.Size(70, 19);
+            this.chbMonday.TabIndex = 2;
+            this.chbMonday.Text = "Monday";
+            this.chbMonday.UseVisualStyleBackColor = true;
+            // 
+            // rdbAutorunModeNone
+            // 
+            this.rdbAutorunModeNone.AutoSize = true;
+            this.rdbAutorunModeNone.Location = new System.Drawing.Point(141, 22);
+            this.rdbAutorunModeNone.Name = "rdbAutorunModeNone";
+            this.rdbAutorunModeNone.Size = new System.Drawing.Size(84, 19);
+            this.rdbAutorunModeNone.TabIndex = 1;
+            this.rdbAutorunModeNone.TabStop = true;
+            this.rdbAutorunModeNone.Text = "no autorun";
+            this.rdbAutorunModeNone.UseVisualStyleBackColor = true;
+            this.rdbAutorunModeNone.CheckedChanged += new System.EventHandler(this.rdbAutorunModeNone_CheckedChanged);
+            // 
+            // rdbAutorunModeAuto
+            // 
+            this.rdbAutorunModeAuto.AutoSize = true;
+            this.rdbAutorunModeAuto.Location = new System.Drawing.Point(6, 22);
+            this.rdbAutorunModeAuto.Name = "rdbAutorunModeAuto";
+            this.rdbAutorunModeAuto.Size = new System.Drawing.Size(85, 19);
+            this.rdbAutorunModeAuto.TabIndex = 0;
+            this.rdbAutorunModeAuto.TabStop = true;
+            this.rdbAutorunModeAuto.Text = "set autorun";
+            this.rdbAutorunModeAuto.UseVisualStyleBackColor = true;
+            this.rdbAutorunModeAuto.CheckedChanged += new System.EventHandler(this.rdbAutorunModeAuto_CheckedChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(351, 369);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(315, 15);
+            this.label8.TabIndex = 16;
+            this.label8.Text = "If not saved, the archive will only be uploaded to the cloud";
+            // 
+            // label9
+            // 
+            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label9.Location = new System.Drawing.Point(351, 390);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(255, 15);
+            this.label9.TabIndex = 17;
+            this.label9.Text = "You can follow these steps now with settings";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(351, 83);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(58, 15);
+            this.label10.TabIndex = 18;
+            this.label10.Text = "Job name";
+            // 
+            // txtJobName
+            // 
+            this.txtJobName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtJobName.Location = new System.Drawing.Point(414, 80);
+            this.txtJobName.Name = "txtJobName";
+            this.txtJobName.Size = new System.Drawing.Size(583, 23);
+            this.txtJobName.TabIndex = 19;
             // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(998, 516);
+            this.ClientSize = new System.Drawing.Size(1009, 481);
+            this.Controls.Add(this.txtJobName);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.grbSchedule);
+            this.Controls.Add(this.grbConnection);
+            this.Controls.Add(this.txtFolder);
+            this.Controls.Add(this.btnFolderSelect);
+            this.Controls.Add(this.btnBackupAndUpload);
+            this.Controls.Add(this.chbSaveToFolder);
+            this.Controls.Add(this.btnBackupOnly);
             this.Controls.Add(this.btnGoogleAuthorize);
-            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.dgvJobList);
+            this.MinimumSize = new System.Drawing.Size(1025, 520);
             this.Name = "FrmMain";
             this.Text = "SqlBackuper to Google Drive";
             ((System.ComponentModel.ISupportInitialize)(this.dgvJobList)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tpJobDetail.ResumeLayout(false);
-            this.tpJobDetail.PerformLayout();
             this.grbConnection.ResumeLayout(false);
             this.grbConnection.PerformLayout();
+            this.grbSchedule.ResumeLayout(false);
+            this.grbSchedule.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvRunTime)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -399,9 +609,14 @@
         private System.Windows.Forms.ToolStripButton tsbJobAdd;
         private System.Windows.Forms.ToolStripButton tsbJobEdit;
         private System.Windows.Forms.ToolStripButton tsbJobDelete;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tpJobDetail;
-        private System.Windows.Forms.TabPage tbpSchedule;
+        private System.Windows.Forms.Button btnGoogleAuthorize;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox chbSaveToFolder;
+        private System.Windows.Forms.Button btnBackupAndUpload;
+        private System.Windows.Forms.Button btnFolderSelect;
+        private System.Windows.Forms.TextBox txtFolder;
+        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox grbConnection;
         private System.Windows.Forms.Button btnConTest;
         private System.Windows.Forms.RadioButton rdbConAuthWin;
@@ -414,15 +629,29 @@
         private System.Windows.Forms.TextBox txtConDatabase;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtConServer;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnGoogleAuthorize;
-        private System.Windows.Forms.Button btnFolderSelect;
-        private System.Windows.Forms.TextBox txtFolder;
+        private System.Windows.Forms.GroupBox grbSchedule;
+        private System.Windows.Forms.CheckBox chbSunday;
+        private System.Windows.Forms.CheckBox chbSaturday;
+        private System.Windows.Forms.CheckBox chbFriday;
+        private System.Windows.Forms.CheckBox chbThursday;
+        private System.Windows.Forms.CheckBox chbWednesday;
+        private System.Windows.Forms.CheckBox chbTuesday;
+        private System.Windows.Forms.CheckBox chbMonday;
+        private System.Windows.Forms.RadioButton rdbAutorunModeNone;
+        private System.Windows.Forms.RadioButton rdbAutorunModeAuto;
+        private System.Windows.Forms.DataGridView dgvRunTime;
+        private System.Windows.Forms.DateTimePicker dtpRunTime;
+        private System.Windows.Forms.Button btnTimeAdd;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button btnBackupAndUpload;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-        private System.Windows.Forms.CheckBox chbSaveToFolder;
-        private System.Windows.Forms.Button btnCreateBackupOnly;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btnRunTimeDelete;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button btnBackupOnly;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox txtJobName;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button btnRunTimeAdd;
     }
 }
 

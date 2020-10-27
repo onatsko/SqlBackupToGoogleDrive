@@ -20,27 +20,115 @@ namespace Sql2GDrive
         {
             InitializeComponent();
 
+            dgvJobListSetup();
+            EnableDisableJobDetailControls(false);
+
             GetJobs();
 
         }
 
+        private void EnableDisableJobDetailControls(bool state)
+        {
+            txtJobName.Enabled = state;
+
+            grbConnection.Enabled = state;
+            grbSchedule.Enabled = state;
+            chbSaveToFolder.Enabled = state;
+            txtFolder.Enabled = state;
+            btnFolderSelect.Enabled = state;
+
+            if (!state)
+            {
+                rdbConAuthSql.Checked = state;
+                rdbConAuthWin.Checked = state;
+            }
+
+            if (!state)
+            {
+                rdbAutorunModeAuto.Checked = state;
+                rdbAutorunModeNone.Checked = state;
+            }
+
+            btnBackupAndUpload.Enabled = state;
+            btnBackupOnly.Enabled = state;
+
+        }
+
+        private void dgvJobListSetup()
+        {
+            dgvJobList.DataSource = null;
+            dgvJobList.Columns.Clear();
+            dgvJobList.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dgvJobList.AutoGenerateColumns = false;
+            dgvJobList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvJobList.AllowUserToAddRows = false;
+            dgvJobList.AllowUserToDeleteRows = false;
+            dgvJobList.RowHeadersVisible = false;
+
+            int i = 0;
+            dgvJobList.ColumnCount = 2;
+
+            dgvJobList.Columns[i].Visible = true;
+            dgvJobList.Columns[i].HeaderText = "#";
+            dgvJobList.Columns[i].Width = 15;
+            dgvJobList.Columns[i].DataPropertyName = "Id";
+            dgvJobList.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dgvJobList.Columns[i].Name = dgvJobList.Columns[i].DataPropertyName;
+            i += 1;
+            dgvJobList.Columns[i].Visible = true;
+            dgvJobList.Columns[i].HeaderText = "Job name";
+            dgvJobList.Columns[i].Width = 150;
+            dgvJobList.Columns[i].DataPropertyName = "Name";
+            dgvJobList.Columns[i].Name = dgvJobList.Columns[i].DataPropertyName;
+            dgvJobList.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
         private void GetJobs()
         {
+            dgvJobList.DataSource = null;
+            dgvJobList.Rows.Clear();
+            
             using (var db = new JobContext())
             {
-                var jobs = db.Jobs.Where(x => x.JobId > 0);
+                var jobs = db.Jobs.Where(x => !x.IsDel).ToList();
+                if (jobs != null && jobs.Count > 0)
+                {
+                    dgvJobList.DataSource = jobs;
+                }
             }
         }
 
         private void tsbJobAdd_Click(object sender, EventArgs e)
         {
+            var job = new Job();
+            job.Name = "New job";
+            job.Connection = new Connection()
+            {
+                Server = "localhost",
+                Database = "db",
+                AuthSql = true,
+                AuthWindows = false,
+                Login = "sa",
+                Password = ""
+            };
+            job.Schedule = new Schedule();
+
+
             using (var db = new JobContext())
             {
-                var job = new Job();
-                job.Connection = new Connection();
-                job.Schedule = new Schedule();
                 db.Jobs.Add(job);
                 db.SaveChanges();
+            }
+
+            GetJobs();
+
+            for (int i = 0; i < dgvJobList.RowCount; i++)
+            {
+                if (job.Id == (int) dgvJobList["Id", i].Value)
+                {
+                    dgvJobList.CurrentCell = dgvJobList["id", i];
+                    break;
+                }
             }
         }
 
@@ -129,7 +217,7 @@ namespace Sql2GDrive
 
         }
 
-        private void SetControlAccess()
+        private void SetControlAccessConAuth()
         {
             if (rdbConAuthSql.Checked)
             {
@@ -145,12 +233,12 @@ namespace Sql2GDrive
 
         private void rdbConAuthSql_CheckedChanged(object sender, EventArgs e)
         {
-            SetControlAccess();
+            SetControlAccessConAuth();
         }
 
         private void rdbConAuthWin_CheckedChanged(object sender, EventArgs e)
         {
-            SetControlAccess();
+            SetControlAccessConAuth();
         }
 
         private void btnFIleSelect_Click(object sender, EventArgs e)
@@ -230,6 +318,137 @@ namespace Sql2GDrive
             }
         }
 
+        private void dgvJobList_SelectionChanged(object sender, EventArgs e)
+        {
+            EnableDisableJobDetailControls(false);
+            if (dgvJobList.CurrentCellAddress.Y < 0)
+                return;
+
+            var id = (int) dgvJobList["Id", dgvJobList.CurrentCellAddress.Y].Value;
+            using (var db = new JobContext())
+            {
+                var job = db.Jobs.FirstOrDefault(x => x.Id == id);
+                if (job == null)
+                    return;
+
+                FillData(job);
+            }
+        }
+
+        private void FillData(Job job)
+        {
+            EnableDisableJobDetailControls(true);
+
+            txtJobName.Text = job.Name;
+
+            txtConServer.Text = job.Connection.Server;
+            txtConDatabase.Text = job.Connection.Database;
+            if (job.Connection.AuthSql)
+            {
+                rdbConAuthSql.Checked = true;
+                rdbConAuthWin.Checked = false;
+
+                txtConLogin.Text = job.Connection.Login;
+                txtConPassword.Text = job.Connection.Password;
+            }
+            else if (job.Connection.AuthWindows)
+            {
+                rdbConAuthWin.Checked = true;
+                rdbConAuthSql.Checked = false;
+
+                txtConLogin.Text = "";
+                txtConPassword.Text = "";
+            }
+
+            if (job.IsSaveToLocalFolder)
+            {
+                chbSaveToFolder.Checked = true;
+                txtFolder.Text = job.FolderPath;
+            }
+            else
+            {
+                chbSaveToFolder.Checked = false;
+                txtFolder.Text = "";
+            }
+            chbSaveToFolder_CheckedChanged(null, null);
+
+            if (job.Schedule.DayToRun.RunMode == 0)//none
+            {
+                rdbAutorunModeNone.Checked = true;
+                rdbAutorunModeAuto.Checked = false;
+
+                chbMonday.Checked = job.Schedule.DayToRun.Monday;
+                chbTuesday.Enabled = job.Schedule.DayToRun.Tuesday; 
+                chbWednesday.Enabled = job.Schedule.DayToRun.Wednesday; 
+                chbThursday.Enabled = job.Schedule.DayToRun.Thursday; 
+                chbFriday.Enabled = job.Schedule.DayToRun.Friday; 
+                chbSaturday.Enabled = job.Schedule.DayToRun.Saturday; 
+                chbSunday.Enabled = job.Schedule.DayToRun.Sunday;
+
+                dgvRunTime.DataSource = job.Schedule.TimeToRun;
+            }
+            else if (job.Schedule.DayToRun.RunMode == 1)//autorun
+            {
+                rdbAutorunModeNone.Checked = false;
+                rdbAutorunModeAuto.Checked = true;
+
+                chbMonday.Checked = job.Schedule.DayToRun.Monday;
+                chbTuesday.Enabled = job.Schedule.DayToRun.Tuesday;
+                chbWednesday.Enabled = job.Schedule.DayToRun.Wednesday;
+                chbThursday.Enabled = job.Schedule.DayToRun.Thursday;
+                chbFriday.Enabled = job.Schedule.DayToRun.Friday;
+                chbSaturday.Enabled = job.Schedule.DayToRun.Saturday;
+                chbSunday.Enabled = job.Schedule.DayToRun.Sunday;
+
+                dgvRunTime.DataSource = job.Schedule.TimeToRun;
+            }
+            SetControlAccessRunMode();
+
+        }
+
+        private void SetControlAccessRunMode()
+        {
+            if (rdbAutorunModeAuto.Checked)
+            {
+                chbMonday.Enabled = true;
+                chbTuesday.Enabled = true;
+                chbWednesday.Enabled = true;
+                chbThursday.Enabled = true;
+                chbFriday.Enabled = true;
+                chbSaturday.Enabled = true;
+                chbSunday.Enabled = true;
+
+                dgvRunTime.Enabled = true;
+                dtpRunTime.Enabled = true;
+                btnRunTimeAdd.Enabled = true;
+                btnRunTimeDelete.Enabled = true;
+            }
+            else
+            {
+                chbMonday.Enabled = false;
+                chbTuesday.Enabled = false;
+                chbWednesday.Enabled = false;
+                chbThursday.Enabled = false;
+                chbFriday.Enabled = false;
+                chbSaturday.Enabled = false;
+                chbSunday.Enabled = false;
+
+                dgvRunTime.Enabled = false;
+                dtpRunTime.Enabled = false;
+                btnRunTimeAdd.Enabled = false;
+                btnRunTimeDelete.Enabled = false;
+            }
+        }
+
+        private void rdbAutorunModeAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            SetControlAccessRunMode();
+        }
+
+        private void rdbAutorunModeNone_CheckedChanged(object sender, EventArgs e)
+        {
+            SetControlAccessRunMode();
+        }
     }
 
 
