@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Sql2GoogleDrive.DAL.TaskContext;
+using Sql2GoogleDrive.DAL;
 
 namespace Sql2GoogleDrive.Migrations
 {
     [DbContext(typeof(JobContext))]
-    [Migration("20201027185333_Init")]
+    [Migration("20201029195738_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace Sql2GoogleDrive.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.9");
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.Connection", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.Connection", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace Sql2GoogleDrive.Migrations
                     b.ToTable("Connections");
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.DayToRun", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.DayToRun", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,6 +59,9 @@ namespace Sql2GoogleDrive.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Monday")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RunMode")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Saturday")
@@ -81,7 +84,7 @@ namespace Sql2GoogleDrive.Migrations
                     b.ToTable("DayToRun");
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.Job", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.Job", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,7 +118,7 @@ namespace Sql2GoogleDrive.Migrations
                     b.ToTable("Jobs");
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.Schedule", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.Schedule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,13 +134,13 @@ namespace Sql2GoogleDrive.Migrations
                     b.ToTable("Schedules");
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.TimeToRun", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.TimeToRun", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ScheduleId")
+                    b.Property<int>("ScheduleId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Time")
@@ -147,38 +150,40 @@ namespace Sql2GoogleDrive.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("TimeToRun");
+                    b.ToTable("TimeToRuns");
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.Job", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.Job", b =>
                 {
-                    b.HasOne("Sql2GoogleDrive.DAL.TaskContext.Connection", "Connection")
+                    b.HasOne("Sql2GoogleDrive.DAL.Connection", "Connection")
                         .WithMany()
                         .HasForeignKey("ConnectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Sql2GoogleDrive.DAL.TaskContext.Schedule", "Schedule")
+                    b.HasOne("Sql2GoogleDrive.DAL.Schedule", "Schedule")
                         .WithMany()
                         .HasForeignKey("ScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.Schedule", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.Schedule", b =>
                 {
-                    b.HasOne("Sql2GoogleDrive.DAL.TaskContext.DayToRun", "DayToRun")
+                    b.HasOne("Sql2GoogleDrive.DAL.DayToRun", "DayToRun")
                         .WithMany()
                         .HasForeignKey("DayToRunId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sql2GoogleDrive.DAL.TaskContext.TimeToRun", b =>
+            modelBuilder.Entity("Sql2GoogleDrive.DAL.TimeToRun", b =>
                 {
-                    b.HasOne("Sql2GoogleDrive.DAL.TaskContext.Schedule", null)
+                    b.HasOne("Sql2GoogleDrive.DAL.Schedule", null)
                         .WithMany("TimeToRun")
-                        .HasForeignKey("ScheduleId");
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

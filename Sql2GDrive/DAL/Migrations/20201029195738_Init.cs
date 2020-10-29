@@ -31,6 +31,7 @@ namespace Sql2GoogleDrive.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    RunMode = table.Column<int>(nullable: false),
                     Monday = table.Column<bool>(nullable: false),
                     Tuesday = table.Column<bool>(nullable: false),
                     Wednesday = table.Column<bool>(nullable: false),
@@ -94,23 +95,23 @@ namespace Sql2GoogleDrive.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TimeToRun",
+                name: "TimeToRuns",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Time = table.Column<DateTime>(nullable: false),
-                    ScheduleId = table.Column<int>(nullable: true)
+                    ScheduleId = table.Column<int>(nullable: false),
+                    Time = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimeToRun", x => x.Id);
+                    table.PrimaryKey("PK_TimeToRuns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TimeToRun_Schedules_ScheduleId",
+                        name: "FK_TimeToRuns_Schedules_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "Schedules",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -129,8 +130,8 @@ namespace Sql2GoogleDrive.Migrations
                 column: "DayToRunId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeToRun_ScheduleId",
-                table: "TimeToRun",
+                name: "IX_TimeToRuns_ScheduleId",
+                table: "TimeToRuns",
                 column: "ScheduleId");
         }
 
@@ -140,7 +141,7 @@ namespace Sql2GoogleDrive.Migrations
                 name: "Jobs");
 
             migrationBuilder.DropTable(
-                name: "TimeToRun");
+                name: "TimeToRuns");
 
             migrationBuilder.DropTable(
                 name: "Connections");

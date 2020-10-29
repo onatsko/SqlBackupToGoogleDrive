@@ -75,6 +75,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.txtJobName = new System.Windows.Forms.TextBox();
+            this.btnJobSave = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvJobList)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.grbConnection.SuspendLayout();
@@ -89,7 +90,7 @@
             this.dgvJobList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvJobList.Location = new System.Drawing.Point(12, 80);
             this.dgvJobList.Name = "dgvJobList";
-            this.dgvJobList.Size = new System.Drawing.Size(333, 389);
+            this.dgvJobList.Size = new System.Drawing.Size(333, 419);
             this.dgvJobList.TabIndex = 0;
             this.dgvJobList.Text = "dataGridView1";
             this.dgvJobList.SelectionChanged += new System.EventHandler(this.dgvJobList_SelectionChanged);
@@ -150,7 +151,7 @@
             // 
             this.btnBackupOnly.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBackupOnly.Location = new System.Drawing.Point(351, 446);
+            this.btnBackupOnly.Location = new System.Drawing.Point(351, 476);
             this.btnBackupOnly.Name = "btnBackupOnly";
             this.btnBackupOnly.Size = new System.Drawing.Size(638, 23);
             this.btnBackupOnly.TabIndex = 14;
@@ -161,7 +162,7 @@
             // chbSaveToFolder
             // 
             this.chbSaveToFolder.AutoSize = true;
-            this.chbSaveToFolder.Location = new System.Drawing.Point(351, 315);
+            this.chbSaveToFolder.Location = new System.Drawing.Point(351, 330);
             this.chbSaveToFolder.Name = "chbSaveToFolder";
             this.chbSaveToFolder.Size = new System.Drawing.Size(139, 19);
             this.chbSaveToFolder.TabIndex = 13;
@@ -173,7 +174,7 @@
             // 
             this.btnBackupAndUpload.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBackupAndUpload.Location = new System.Drawing.Point(351, 417);
+            this.btnBackupAndUpload.Location = new System.Drawing.Point(351, 447);
             this.btnBackupAndUpload.Name = "btnBackupAndUpload";
             this.btnBackupAndUpload.Size = new System.Drawing.Size(638, 23);
             this.btnBackupAndUpload.TabIndex = 12;
@@ -184,7 +185,7 @@
             // btnFolderSelect
             // 
             this.btnFolderSelect.Enabled = false;
-            this.btnFolderSelect.Location = new System.Drawing.Point(632, 339);
+            this.btnFolderSelect.Location = new System.Drawing.Point(632, 354);
             this.btnFolderSelect.Name = "btnFolderSelect";
             this.btnFolderSelect.Size = new System.Drawing.Size(28, 23);
             this.btnFolderSelect.TabIndex = 11;
@@ -195,7 +196,7 @@
             // txtFolder
             // 
             this.txtFolder.Enabled = false;
-            this.txtFolder.Location = new System.Drawing.Point(374, 340);
+            this.txtFolder.Location = new System.Drawing.Point(374, 355);
             this.txtFolder.Name = "txtFolder";
             this.txtFolder.Size = new System.Drawing.Size(252, 23);
             this.txtFolder.TabIndex = 10;
@@ -372,15 +373,16 @@
             this.grbSchedule.Controls.Add(this.rdbAutorunModeAuto);
             this.grbSchedule.Location = new System.Drawing.Point(672, 109);
             this.grbSchedule.Name = "grbSchedule";
-            this.grbSchedule.Size = new System.Drawing.Size(325, 254);
+            this.grbSchedule.Size = new System.Drawing.Size(325, 239);
             this.grbSchedule.TabIndex = 15;
             this.grbSchedule.TabStop = false;
             this.grbSchedule.Text = "Autorun schedule";
             // 
             // label7
             // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(32, 53);
+            this.label7.Location = new System.Drawing.Point(32, 45);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(67, 15);
             this.label7.TabIndex = 4;
@@ -388,7 +390,8 @@
             // 
             // btnRunTimeDelete
             // 
-            this.btnRunTimeDelete.Location = new System.Drawing.Point(220, 186);
+            this.btnRunTimeDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRunTimeDelete.Location = new System.Drawing.Point(220, 178);
             this.btnRunTimeDelete.Name = "btnRunTimeDelete";
             this.btnRunTimeDelete.Size = new System.Drawing.Size(94, 23);
             this.btnRunTimeDelete.TabIndex = 8;
@@ -399,8 +402,9 @@
             // 
             this.dgvRunTime.AllowUserToAddRows = false;
             this.dgvRunTime.AllowUserToDeleteRows = false;
+            this.dgvRunTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.dgvRunTime.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvRunTime.Location = new System.Drawing.Point(141, 71);
+            this.dgvRunTime.Location = new System.Drawing.Point(141, 63);
             this.dgvRunTime.Name = "dgvRunTime";
             this.dgvRunTime.ReadOnly = true;
             this.dgvRunTime.Size = new System.Drawing.Size(73, 138);
@@ -409,26 +413,30 @@
             // 
             // dtpRunTime
             // 
+            this.dtpRunTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.dtpRunTime.CustomFormat = "HH:mm";
             this.dtpRunTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpRunTime.Location = new System.Drawing.Point(141, 215);
+            this.dtpRunTime.Location = new System.Drawing.Point(141, 207);
             this.dtpRunTime.Name = "dtpRunTime";
             this.dtpRunTime.Size = new System.Drawing.Size(73, 23);
             this.dtpRunTime.TabIndex = 6;
             // 
             // btnRunTimeAdd
             // 
-            this.btnRunTimeAdd.Location = new System.Drawing.Point(220, 215);
+            this.btnRunTimeAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRunTimeAdd.Location = new System.Drawing.Point(220, 207);
             this.btnRunTimeAdd.Name = "btnRunTimeAdd";
             this.btnRunTimeAdd.Size = new System.Drawing.Size(94, 23);
             this.btnRunTimeAdd.TabIndex = 5;
             this.btnRunTimeAdd.Text = "Add time";
             this.btnRunTimeAdd.UseVisualStyleBackColor = true;
+            this.btnRunTimeAdd.Click += new System.EventHandler(this.btnRunTimeAdd_Click);
             // 
             // label6
             // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(142, 53);
+            this.label6.Location = new System.Drawing.Point(142, 45);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(73, 15);
             this.label6.TabIndex = 4;
@@ -436,8 +444,9 @@
             // 
             // chbSunday
             // 
+            this.chbSunday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbSunday.AutoSize = true;
-            this.chbSunday.Location = new System.Drawing.Point(32, 219);
+            this.chbSunday.Location = new System.Drawing.Point(32, 211);
             this.chbSunday.Name = "chbSunday";
             this.chbSunday.Size = new System.Drawing.Size(65, 19);
             this.chbSunday.TabIndex = 2;
@@ -446,8 +455,9 @@
             // 
             // chbSaturday
             // 
+            this.chbSaturday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbSaturday.AutoSize = true;
-            this.chbSaturday.Location = new System.Drawing.Point(32, 194);
+            this.chbSaturday.Location = new System.Drawing.Point(32, 186);
             this.chbSaturday.Name = "chbSaturday";
             this.chbSaturday.Size = new System.Drawing.Size(72, 19);
             this.chbSaturday.TabIndex = 2;
@@ -456,8 +466,9 @@
             // 
             // chbFriday
             // 
+            this.chbFriday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbFriday.AutoSize = true;
-            this.chbFriday.Location = new System.Drawing.Point(32, 169);
+            this.chbFriday.Location = new System.Drawing.Point(32, 161);
             this.chbFriday.Name = "chbFriday";
             this.chbFriday.Size = new System.Drawing.Size(58, 19);
             this.chbFriday.TabIndex = 2;
@@ -466,8 +477,9 @@
             // 
             // chbThursday
             // 
+            this.chbThursday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbThursday.AutoSize = true;
-            this.chbThursday.Location = new System.Drawing.Point(32, 144);
+            this.chbThursday.Location = new System.Drawing.Point(32, 136);
             this.chbThursday.Name = "chbThursday";
             this.chbThursday.Size = new System.Drawing.Size(74, 19);
             this.chbThursday.TabIndex = 2;
@@ -476,8 +488,9 @@
             // 
             // chbWednesday
             // 
+            this.chbWednesday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbWednesday.AutoSize = true;
-            this.chbWednesday.Location = new System.Drawing.Point(32, 119);
+            this.chbWednesday.Location = new System.Drawing.Point(32, 111);
             this.chbWednesday.Name = "chbWednesday";
             this.chbWednesday.Size = new System.Drawing.Size(87, 19);
             this.chbWednesday.TabIndex = 2;
@@ -486,8 +499,9 @@
             // 
             // chbTuesday
             // 
+            this.chbTuesday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbTuesday.AutoSize = true;
-            this.chbTuesday.Location = new System.Drawing.Point(32, 94);
+            this.chbTuesday.Location = new System.Drawing.Point(32, 86);
             this.chbTuesday.Name = "chbTuesday";
             this.chbTuesday.Size = new System.Drawing.Size(69, 19);
             this.chbTuesday.TabIndex = 2;
@@ -496,8 +510,9 @@
             // 
             // chbMonday
             // 
+            this.chbMonday.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chbMonday.AutoSize = true;
-            this.chbMonday.Location = new System.Drawing.Point(32, 71);
+            this.chbMonday.Location = new System.Drawing.Point(32, 63);
             this.chbMonday.Name = "chbMonday";
             this.chbMonday.Size = new System.Drawing.Size(70, 19);
             this.chbMonday.TabIndex = 2;
@@ -531,7 +546,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(351, 369);
+            this.label8.Location = new System.Drawing.Point(351, 312);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(315, 15);
             this.label8.TabIndex = 16;
@@ -543,11 +558,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label9.Location = new System.Drawing.Point(351, 390);
+            this.label9.Location = new System.Drawing.Point(351, 420);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(255, 15);
+            this.label9.Size = new System.Drawing.Size(278, 15);
             this.label9.TabIndex = 17;
-            this.label9.Text = "You can follow these steps now with settings";
+            this.label9.Text = "You can follow these steps now with job settings:";
             // 
             // label10
             // 
@@ -567,11 +582,25 @@
             this.txtJobName.Size = new System.Drawing.Size(583, 23);
             this.txtJobName.TabIndex = 19;
             // 
+            // btnJobSave
+            // 
+            this.btnJobSave.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.btnJobSave.Image = ((System.Drawing.Image)(resources.GetObject("btnJobSave.Image")));
+            this.btnJobSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnJobSave.Location = new System.Drawing.Point(672, 354);
+            this.btnJobSave.Name = "btnJobSave";
+            this.btnJobSave.Size = new System.Drawing.Size(325, 23);
+            this.btnJobSave.TabIndex = 20;
+            this.btnJobSave.Text = "Save job";
+            this.btnJobSave.UseVisualStyleBackColor = true;
+            this.btnJobSave.Click += new System.EventHandler(this.btnJobSave_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1009, 481);
+            this.ClientSize = new System.Drawing.Size(1009, 511);
+            this.Controls.Add(this.btnJobSave);
             this.Controls.Add(this.txtJobName);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
@@ -611,7 +640,7 @@
         private System.Windows.Forms.ToolStripButton tsbJobDelete;
         private System.Windows.Forms.Button btnGoogleAuthorize;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnJobSave;
         private System.Windows.Forms.CheckBox chbSaveToFolder;
         private System.Windows.Forms.Button btnBackupAndUpload;
         private System.Windows.Forms.Button btnFolderSelect;

@@ -1,4 +1,6 @@
+using Sql2GoogleDrive;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Sql2GDrive
@@ -9,7 +11,7 @@ namespace Sql2GDrive
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();

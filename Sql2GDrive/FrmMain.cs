@@ -3,28 +3,33 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using Sql2GoogleDrive.DAL.TaskContext;
+using Microsoft.EntityFrameworkCore;
+using Sql2GoogleDrive.DAL;
 
 namespace Sql2GDrive
 {
     public partial class FrmMain : Form
     {
+        private Job _job;
+        private bool _isLoadingData;
 
         public FrmMain()
         {
             InitializeComponent();
 
             dgvJobListSetup();
+            dgvRunTimeListSetup();
             EnableDisableJobDetailControls(false);
 
             GetJobs();
-
+            AdviseToControlEvents();
         }
 
         private void EnableDisableJobDetailControls(bool state)
@@ -37,17 +42,14 @@ namespace Sql2GDrive
             txtFolder.Enabled = state;
             btnFolderSelect.Enabled = state;
 
-            if (!state)
-            {
-                rdbConAuthSql.Checked = state;
-                rdbConAuthWin.Checked = state;
-            }
 
-            if (!state)
-            {
-                rdbAutorunModeAuto.Checked = state;
-                rdbAutorunModeNone.Checked = state;
-            }
+            rdbConAuthSql.Enabled = state;
+            rdbConAuthWin.Enabled = state;
+
+            rdbAutorunModeAuto.Enabled = state;
+            rdbAutorunModeNone.Enabled = state;
+
+            btnJobSave.Enabled = state;
 
             btnBackupAndUpload.Enabled = state;
             btnBackupOnly.Enabled = state;
@@ -70,7 +72,7 @@ namespace Sql2GDrive
 
             dgvJobList.Columns[i].Visible = true;
             dgvJobList.Columns[i].HeaderText = "#";
-            dgvJobList.Columns[i].Width = 15;
+            dgvJobList.Columns[i].Width = 20;
             dgvJobList.Columns[i].DataPropertyName = "Id";
             dgvJobList.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             dgvJobList.Columns[i].Name = dgvJobList.Columns[i].DataPropertyName;
@@ -81,6 +83,36 @@ namespace Sql2GDrive
             dgvJobList.Columns[i].DataPropertyName = "Name";
             dgvJobList.Columns[i].Name = dgvJobList.Columns[i].DataPropertyName;
             dgvJobList.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        private void dgvRunTimeListSetup()
+        {
+            dgvRunTime.DataSource = null;
+            dgvRunTime.Columns.Clear();
+            dgvRunTime.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dgvRunTime.AutoGenerateColumns = false;
+            dgvRunTime.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvRunTime.AllowUserToAddRows = false;
+            dgvRunTime.AllowUserToDeleteRows = false;
+            dgvRunTime.RowHeadersVisible = false;
+
+            int i = 0;
+            dgvRunTime.ColumnCount = 2;
+
+            dgvRunTime.Columns[i].Visible = true;
+            dgvRunTime.Columns[i].HeaderText = "#";
+            dgvRunTime.Columns[i].Width = 20;
+            dgvRunTime.Columns[i].DataPropertyName = "Id";
+            dgvRunTime.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dgvRunTime.Columns[i].Name = dgvRunTime.Columns[i].DataPropertyName;
+            i += 1;
+            dgvRunTime.Columns[i].Visible = true;
+            dgvRunTime.Columns[i].HeaderText = "Time";
+            dgvRunTime.Columns[i].Width = 75;
+            dgvRunTime.Columns[i].DataPropertyName = "Time";
+            dgvRunTime.Columns[i].DefaultCellStyle.Format = "HH:mm";
+            dgvRunTime.Columns[i].Name = dgvRunTime.Columns[i].DataPropertyName;
+            dgvRunTime.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
 
         private void GetJobs()
@@ -100,6 +132,11 @@ namespace Sql2GDrive
 
         private void tsbJobAdd_Click(object sender, EventArgs e)
         {
+            if (!CheckIfNeedSave())
+                return;
+
+            _isLoadingData = true;
+
             var job = new Job();
             job.Name = "New job";
             job.Connection = new Connection()
@@ -112,19 +149,28 @@ namespace Sql2GDrive
                 Password = ""
             };
             job.Schedule = new Schedule();
-
+            job.Schedule.TimeToRun = new List<TimeToRun>();
 
             using (var db = new JobContext())
             {
+                db.TimeToRuns.AddRange(job.Schedule.TimeToRun);
+                db.Schedules.Add(job.Schedule);
+                db.Connections.Add(job.Connection);
                 db.Jobs.Add(job);
                 db.SaveChanges();
             }
 
             GetJobs();
+            SetJobSelectedInList(job.Id);
 
+            _isLoadingData = false;
+        }
+
+        private void SetJobSelectedInList(int jobId)
+        {
             for (int i = 0; i < dgvJobList.RowCount; i++)
             {
-                if (job.Id == (int) dgvJobList["Id", i].Value)
+                if ((int)dgvJobList["Id", i].Value == jobId)
                 {
                     dgvJobList.CurrentCell = dgvJobList["id", i];
                     break;
@@ -318,40 +364,104 @@ namespace Sql2GDrive
             }
         }
 
+        private Job GetJobFullFromDb(int id)
+        {
+            using (var db = new JobContext())
+            {
+                var job = db.Jobs
+                    .Include(x => x.Connection)
+                    .Include(x => x.Schedule)
+                    .ThenInclude(x => x.DayToRun)
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (job != null)
+                {
+                    var scheduleId = job.ScheduleId;
+                    var times = db.TimeToRuns.Where(x => x.ScheduleId == scheduleId).ToList();
+                    if (times.Count > 0)
+                    {
+                        job.Schedule.TimeToRun = times;
+                    }
+                }
+
+                return job;
+            }
+        }
+
+        //спрашиваем о сохранении, перед тем как перейти на следующий элемент
+        private bool CheckIfNeedSave()
+        {
+            if (_job == null)
+                return true;
+            if (_isLoadingData)
+                return true;
+
+
+            var jobInDb = GetJobFullFromDb(_job.Id);
+
+            if (!jobInDb.Equals(_job))
+            {
+                var q = MessageBox.Show("Save changes?", Text, MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question);
+
+                if (q == DialogResult.No)
+                    return true;
+
+                if (q == DialogResult.Yes)
+                {
+                    JobSave();
+                    return true;
+                }
+
+                if (q == DialogResult.Cancel)
+                    return false;
+
+            }
+
+            return true;
+
+        }
+
         private void dgvJobList_SelectionChanged(object sender, EventArgs e)
         {
             EnableDisableJobDetailControls(false);
             if (dgvJobList.CurrentCellAddress.Y < 0)
                 return;
 
+            if (!CheckIfNeedSave())
+                return;
+
+            _isLoadingData = true;
             var id = (int) dgvJobList["Id", dgvJobList.CurrentCellAddress.Y].Value;
             using (var db = new JobContext())
             {
-                var job = db.Jobs.FirstOrDefault(x => x.Id == id);
-                if (job == null)
+                _job = GetJobFullFromDb(id);
+                if (_job == null)
                     return;
 
-                FillData(job);
+                FillData();
             }
+
+            _isLoadingData = false;
         }
 
-        private void FillData(Job job)
+        private void FillData()
         {
             EnableDisableJobDetailControls(true);
 
-            txtJobName.Text = job.Name;
+            txtJobName.Text = _job.Name;
 
-            txtConServer.Text = job.Connection.Server;
-            txtConDatabase.Text = job.Connection.Database;
-            if (job.Connection.AuthSql)
+            txtConServer.Text = _job.Connection.Server;
+            txtConDatabase.Text = _job.Connection.Database;
+            if (_job.Connection.AuthSql)
             {
                 rdbConAuthSql.Checked = true;
                 rdbConAuthWin.Checked = false;
 
-                txtConLogin.Text = job.Connection.Login;
-                txtConPassword.Text = job.Connection.Password;
+                txtConLogin.Text = _job.Connection.Login;
+                txtConPassword.Text = _job.Connection.Password;
             }
-            else if (job.Connection.AuthWindows)
+            else if (_job.Connection.AuthWindows)
             {
                 rdbConAuthWin.Checked = true;
                 rdbConAuthSql.Checked = false;
@@ -360,10 +470,10 @@ namespace Sql2GDrive
                 txtConPassword.Text = "";
             }
 
-            if (job.IsSaveToLocalFolder)
+            if (_job.IsSaveToLocalFolder)
             {
                 chbSaveToFolder.Checked = true;
-                txtFolder.Text = job.FolderPath;
+                txtFolder.Text = _job.FolderPath;
             }
             else
             {
@@ -372,35 +482,35 @@ namespace Sql2GDrive
             }
             chbSaveToFolder_CheckedChanged(null, null);
 
-            if (job.Schedule.DayToRun.RunMode == 0)//none
+            if (_job.Schedule.DayToRun.RunMode == 0)//none
             {
                 rdbAutorunModeNone.Checked = true;
                 rdbAutorunModeAuto.Checked = false;
 
-                chbMonday.Checked = job.Schedule.DayToRun.Monday;
-                chbTuesday.Enabled = job.Schedule.DayToRun.Tuesday; 
-                chbWednesday.Enabled = job.Schedule.DayToRun.Wednesday; 
-                chbThursday.Enabled = job.Schedule.DayToRun.Thursday; 
-                chbFriday.Enabled = job.Schedule.DayToRun.Friday; 
-                chbSaturday.Enabled = job.Schedule.DayToRun.Saturday; 
-                chbSunday.Enabled = job.Schedule.DayToRun.Sunday;
+                chbMonday.Checked = false;
+                chbTuesday.Checked = false;
+                chbWednesday.Checked = false;
+                chbThursday.Checked = false;
+                chbFriday.Checked = false;
+                chbSaturday.Checked = false;
+                chbSunday.Checked = false;
 
-                dgvRunTime.DataSource = job.Schedule.TimeToRun;
+                dgvRunTime.DataSource = _job.Schedule.TimeToRun;
             }
-            else if (job.Schedule.DayToRun.RunMode == 1)//autorun
+            else if (_job.Schedule.DayToRun.RunMode == 1)//autorun
             {
                 rdbAutorunModeNone.Checked = false;
                 rdbAutorunModeAuto.Checked = true;
 
-                chbMonday.Checked = job.Schedule.DayToRun.Monday;
-                chbTuesday.Enabled = job.Schedule.DayToRun.Tuesday;
-                chbWednesday.Enabled = job.Schedule.DayToRun.Wednesday;
-                chbThursday.Enabled = job.Schedule.DayToRun.Thursday;
-                chbFriday.Enabled = job.Schedule.DayToRun.Friday;
-                chbSaturday.Enabled = job.Schedule.DayToRun.Saturday;
-                chbSunday.Enabled = job.Schedule.DayToRun.Sunday;
+                chbMonday.Checked = _job.Schedule.DayToRun.Monday;
+                chbTuesday.Checked = _job.Schedule.DayToRun.Tuesday;
+                chbWednesday.Checked = _job.Schedule.DayToRun.Wednesday;
+                chbThursday.Checked = _job.Schedule.DayToRun.Thursday;
+                chbFriday.Checked = _job.Schedule.DayToRun.Friday;
+                chbSaturday.Checked = _job.Schedule.DayToRun.Saturday;
+                chbSunday.Checked = _job.Schedule.DayToRun.Sunday;
 
-                dgvRunTime.DataSource = job.Schedule.TimeToRun;
+                dgvRunTime.DataSource = _job.Schedule.TimeToRun.OrderBy(x => x.Time).ToList();
             }
             SetControlAccessRunMode();
 
@@ -448,6 +558,245 @@ namespace Sql2GDrive
         private void rdbAutorunModeNone_CheckedChanged(object sender, EventArgs e)
         {
             SetControlAccessRunMode();
+        }
+
+        private void AdviseToControlEvents()
+        {
+            txtJobName.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Name = ((TextBox)o).Text;
+            };
+            txtConServer.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Connection.Server = ((TextBox)o).Text;
+            };
+            txtConDatabase.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Connection.Database= ((TextBox)o).Text;
+            };
+            txtConLogin.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Connection.Login= ((TextBox)o).Text;
+            };
+            txtConPassword.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Connection.Password= ((TextBox)o).Text;
+            };
+            rdbConAuthSql.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Connection.AuthSql = rdbConAuthSql.Checked;
+                //_job.Connection.AuthWindows = !rdbConAuthSql.Checked;
+            };
+            rdbConAuthWin.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                //_job.Connection.AuthSql = !rdbConAuthWin.Checked;
+                _job.Connection.AuthWindows = rdbConAuthWin.Checked;
+            };
+
+            chbSaveToFolder.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                if (chbSaveToFolder.Checked)
+                {
+                    _job.IsSaveToLocalFolder = true;
+                    _job.FolderPath = txtFolder.Text;
+                }
+                else
+                {
+                    _job.IsSaveToLocalFolder = false;
+                    _job.FolderPath = "";
+                }
+            };
+            txtFolder.TextChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.FolderPath= ((TextBox)o).Text;
+            };
+
+            rdbAutorunModeAuto.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.RunMode = 1;//0 - none, 1 - autorun
+            };
+            rdbAutorunModeNone.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.RunMode = 0;// rdbAutorunModeAuto.Checked;
+            };
+
+            chbMonday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Monday = ((CheckBox) o).Checked;
+            };
+            chbTuesday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Tuesday = ((CheckBox)o).Checked;
+            };
+            chbWednesday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Wednesday = ((CheckBox)o).Checked;
+            };
+            chbThursday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Thursday = ((CheckBox)o).Checked;
+            };
+            chbFriday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Friday = ((CheckBox)o).Checked;
+            };
+            chbSaturday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Saturday = ((CheckBox)o).Checked;
+            };
+            chbSunday.CheckedChanged += (o, e) =>
+            {
+                if (_job == null) return;
+                if (_isLoadingData) return;
+                _job.Schedule.DayToRun.Sunday = ((CheckBox)o).Checked;
+            };
+
+
+
+
+
+            //txtNameShort.TextChanged += (o, e) =>
+            //{
+            //    if (!_formFilled) return;
+            //    _formElementObject.NameShort = ((TextBox)o).Text;
+            //};
+            /*
+            chbIsUser.CheckedChanged += (o, e) =>
+                                            {
+                                                if (!_formFilled) return;
+                                                if (chbIsUser.Checked)
+                                                {
+                                                    btnUserOpen.Enabled = true;
+                                                    cmbUser.Enabled = true;
+                                                    var u = new User((long) cmbUser.SelectedValue,
+                                                                 OndMain.mainSettings.local_CurrentUser);
+                                                    _formElementObject.user = u;
+                                                }
+                                                else
+                                                {
+                                                    btnUserOpen.Enabled = false;
+                                                    cmbUser.Enabled = false;
+                                                    _formElementObject.user = null;
+                                                }
+                                            };
+            cmbUser.SelectedValueChanged += (o, e) =>
+                                                {
+                                                    if (!_formFilled) return;
+                                                    if (chbIsUser.Checked)
+                                                    {
+                                                        var u = new User( (long) ((ComboBox)o).SelectedValue;,
+                                                                     OndMain.mainSettings.local_CurrentUser);
+                                                        _formElementObject.user = u;
+                                                    }
+                                                    else
+                                                    {
+                                                        _formElementObject.user = null;
+                                                    }
+
+                                                };
+            nudScheduleEndMinute.ValueChanged += (o, e) =>
+            {
+                if (!_formFilled) return;
+                _formElementObject.scheduleEndMinute = (int)nudScheduleEndMinute.Value;
+            };
+            */
+
+
+        }
+
+        private void btnJobSave_Click(object sender, EventArgs e)
+        {
+            JobSave();
+        }
+
+        private void JobSave()
+        {
+            using (var db = new JobContext())
+            {
+                var con = _job.Connection;
+                if (con.Id == 0)
+                    db.Connections.Add(con);
+                else
+                {
+                    db.Connections.Update(con);
+                }
+                db.SaveChanges();
+
+                for (int i = 0; i < _job.Schedule.TimeToRun.Count; i++)
+                {
+                    var time = _job.Schedule.TimeToRun[i];
+                    if (time.Id == 0)
+                        db.TimeToRuns.Add(time);
+                    else
+                    {
+                        db.TimeToRuns.Update(time);
+                    }
+                }
+                db.SaveChanges();
+
+
+                var sch = _job.Schedule;
+                if (sch.Id == 0)
+                    db.Schedules.Add(sch);
+                else
+                {
+                    db.Schedules.Update(sch);
+                }
+                db.SaveChanges();
+
+                db.Jobs.Update(_job);
+                db.SaveChanges();
+            }
+
+            for (int i = 0; i < dgvJobList.RowCount; i++)
+            {
+                if ((int)dgvJobList["Id", i].Value == _job.Id)
+                {
+                    dgvJobList["Name", i].Value = _job.Name;
+                    break;
+                }
+            }
+        }
+
+        private void btnRunTimeAdd_Click(object sender, EventArgs e)
+        {
+            var timeToRun = new TimeToRun(_job.ScheduleId, dtpRunTime.Value);
+            _job.Schedule.TimeToRun.Add(timeToRun);
+            dgvRunTime.DataSource = _job.Schedule.TimeToRun.OrderBy(x => x.Time).ToList();
         }
     }
 
