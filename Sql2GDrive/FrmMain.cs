@@ -9,9 +9,11 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using Sql2GoogleDrive.DAL;
+using Timer = System.Threading.Timer;
 
 namespace Sql2GDrive
 {
@@ -19,6 +21,7 @@ namespace Sql2GDrive
     {
         private Job _job;
         private bool _isLoadingData;
+        private int _jobRunCount = 0;
 
         public FrmMain()
         {
@@ -30,6 +33,10 @@ namespace Sql2GDrive
 
             GetJobs();
             AdviseToControlEvents();
+
+            lblCount.Text = $"Processed job count: {_jobRunCount}";
+            timer1.Interval = 1000 * 60;//one per minute
+            timer1.Start();
         }
 
         private void EnableDisableJobDetailControls(bool state)
@@ -311,24 +318,42 @@ namespace Sql2GDrive
                 return;
             }
 
-            var frmDo = new FrmBackupAndUpload(
-                txtConServer.Text,
-                txtConDatabase.Text,
-                rdbConAuthWin.Checked,
-                (rdbConAuthSql.Checked ? txtConLogin.Text : ""),
-                (rdbConAuthSql.Checked ? txtConPassword.Text : ""),
-                true,
-                true,
-                true,
-                txtConDatabase.Text.ToUpper(),
-                !chbSaveToFolder.Checked,
-                chbSaveToFolder.Checked ? txtFolder.Text : "",
-                true
-                );
-            frmDo.Show();
-            frmDo.Run();
+            RunJob(_job);
+        }
+
+        private void RunJob(Job job)
+        {
+           // var tProgressThread = new Thread(() =>
+//Task.Run(() =>
+               // {
+                    var frmDo = new FrmBackupAndUpload(
+                        job.Connection.Server, //txtConServer.Text,
+                        job.Connection.Database, //txtConDatabase.Text,
+                        job.Connection.AuthWindows, //rdbConAuthWin.Checked,
+                        job.Connection.AuthSql
+                            ? _job.Connection.Login
+                            : "", //(rdbConAuthSql.Checked ? txtConLogin.Text : ""),
+                        job.Connection.AuthSql
+                            ? _job.Connection.Password
+                            : "", //(rdbConAuthSql.Checked ? txtConPassword.Text : ""),
+                        true,
+                        true,
+                        true,
+                        job.Connection.Database, //txtConDatabase.Text.ToUpper(),
+                        !job.IsSaveToLocalFolder, //!chbSaveToFolder.Checked,
+                        job.IsSaveToLocalFolder ? job.FolderPath : "", //chbSaveToFolder.Checked ? txtFolder.Text : "",
+                        true
+                    );
+                    frmDo.Show();
+                    frmDo.Run();
+                //}
+            //);
+
+        //tProgressThread.Start();
+
 
         }
+
 
         private void btnBackupOnly_Click(object sender, EventArgs e)
         {
@@ -797,6 +822,81 @@ namespace Sql2GDrive
             var timeToRun = new TimeToRun(_job.ScheduleId, dtpRunTime.Value);
             _job.Schedule.TimeToRun.Add(timeToRun);
             dgvRunTime.DataSource = _job.Schedule.TimeToRun.OrderBy(x => x.Time).ToList();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            RunJobsByTimer();
+        }
+
+        private void RunJobsByTimer()
+        {
+            var runToday = new DayToRun();
+            switch (DateTime.Today.DayOfWeek)
+            {
+                case DayOfWeek.Monday:
+                    runToday.Monday = true;
+                    break;
+                case DayOfWeek.Tuesday:
+                    runToday.Tuesday = true;
+                    break;
+                case DayOfWeek.Wednesday:
+                    runToday.Wednesday= true;
+                    break;
+                case DayOfWeek.Thursday:
+                    runToday.Thursday = true;
+                    break;
+                case DayOfWeek.Friday:
+                    runToday.Friday = true;
+                    break;
+                case DayOfWeek.Saturday:
+                    runToday.Saturday = true;
+                    break;
+                case DayOfWeek.Sunday:
+                    runToday.Sunday = true;
+                    break;
+            }
+
+            var hourNow = DateTime.Now.Hour;
+            var minuteNow = DateTime.Now.Minute;
+
+
+            using (var db = new JobContext())
+            {
+                var jobIdsForRun = db.Jobs
+                    .Where(x => !x.IsDel
+                                && x.Schedule.DayToRun.RunMode == 1
+                                )
+                    .Select(x => x.Id)
+                    .ToList();
+
+                if (jobIdsForRun.Count > 0)
+                {
+                    foreach (var jobId in jobIdsForRun)
+                    {
+                        var job = GetJobFullFromDb(jobId);
+                        //не смогло транслировать в линкью
+                        //&& x.Schedule.DayToRun.EqualsDate(runToday)
+                        if (job.Schedule.DayToRun.EqualsDate(runToday))
+                        {
+                            foreach (var jobTime in job.Schedule.TimeToRun)
+                            {
+                                if (jobTime.Time.Hour == hourNow && jobTime.Time.Minute == minuteNow)
+                                {
+                                    RunJob(job);
+                                    _jobRunCount++;
+                                    lblCount.Text = $"Processed job count: {_jobRunCount}";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void btnRunTimeDelete_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

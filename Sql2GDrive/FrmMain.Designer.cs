@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.dgvJobList = new System.Windows.Forms.DataGridView();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -76,6 +77,8 @@
             this.label10 = new System.Windows.Forms.Label();
             this.txtJobName = new System.Windows.Forms.TextBox();
             this.btnJobSave = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.lblCount = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvJobList)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.grbConnection.SuspendLayout();
@@ -397,6 +400,7 @@
             this.btnRunTimeDelete.TabIndex = 8;
             this.btnRunTimeDelete.Text = "Delete selected";
             this.btnRunTimeDelete.UseVisualStyleBackColor = true;
+            this.btnRunTimeDelete.Click += new System.EventHandler(this.btnRunTimeDelete_Click);
             // 
             // dgvRunTime
             // 
@@ -404,10 +408,10 @@
             this.dgvRunTime.AllowUserToDeleteRows = false;
             this.dgvRunTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.dgvRunTime.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvRunTime.Location = new System.Drawing.Point(141, 63);
+            this.dgvRunTime.Location = new System.Drawing.Point(125, 63);
             this.dgvRunTime.Name = "dgvRunTime";
             this.dgvRunTime.ReadOnly = true;
-            this.dgvRunTime.Size = new System.Drawing.Size(73, 138);
+            this.dgvRunTime.Size = new System.Drawing.Size(89, 138);
             this.dgvRunTime.TabIndex = 7;
             this.dgvRunTime.Text = "dataGridView1";
             // 
@@ -416,9 +420,9 @@
             this.dtpRunTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.dtpRunTime.CustomFormat = "HH:mm";
             this.dtpRunTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpRunTime.Location = new System.Drawing.Point(141, 207);
+            this.dtpRunTime.Location = new System.Drawing.Point(125, 207);
             this.dtpRunTime.Name = "dtpRunTime";
-            this.dtpRunTime.Size = new System.Drawing.Size(73, 23);
+            this.dtpRunTime.Size = new System.Drawing.Size(89, 23);
             this.dtpRunTime.TabIndex = 6;
             // 
             // btnRunTimeAdd
@@ -436,7 +440,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(142, 45);
+            this.label6.Location = new System.Drawing.Point(125, 45);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(73, 15);
             this.label6.TabIndex = 4;
@@ -522,7 +526,7 @@
             // rdbAutorunModeNone
             // 
             this.rdbAutorunModeNone.AutoSize = true;
-            this.rdbAutorunModeNone.Location = new System.Drawing.Point(141, 22);
+            this.rdbAutorunModeNone.Location = new System.Drawing.Point(125, 23);
             this.rdbAutorunModeNone.Name = "rdbAutorunModeNone";
             this.rdbAutorunModeNone.Size = new System.Drawing.Size(84, 19);
             this.rdbAutorunModeNone.TabIndex = 1;
@@ -584,6 +588,8 @@
             // 
             // btnJobSave
             // 
+            this.btnJobSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnJobSave.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnJobSave.Image = ((System.Drawing.Image)(resources.GetObject("btnJobSave.Image")));
             this.btnJobSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -595,11 +601,26 @@
             this.btnJobSave.UseVisualStyleBackColor = true;
             this.btnJobSave.Click += new System.EventHandler(this.btnJobSave_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // lblCount
+            // 
+            this.lblCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblCount.Location = new System.Drawing.Point(642, 16);
+            this.lblCount.Name = "lblCount";
+            this.lblCount.Size = new System.Drawing.Size(355, 19);
+            this.lblCount.TabIndex = 21;
+            this.lblCount.Text = "label12";
+            this.lblCount.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1009, 511);
+            this.Controls.Add(this.lblCount);
             this.Controls.Add(this.btnJobSave);
             this.Controls.Add(this.txtJobName);
             this.Controls.Add(this.label10);
@@ -681,6 +702,8 @@
         private System.Windows.Forms.TextBox txtJobName;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnRunTimeAdd;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label lblCount;
     }
 }
 

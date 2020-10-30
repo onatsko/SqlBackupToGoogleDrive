@@ -209,6 +209,11 @@ namespace Sql2GoogleDrive.DAL
         public bool Saturday { get; set; }
         public bool Sunday { get; set; }
 
+        public bool EqualsDate(DayToRun other)
+        {
+            return Monday == other.Monday && Tuesday == other.Tuesday && Wednesday == other.Wednesday && Thursday == other.Thursday && Friday == other.Friday && Saturday == other.Saturday && Sunday == other.Sunday;
+        }
+
         protected bool Equals(DayToRun other)
         {
             return Id == other.Id && RunMode == other.RunMode && Monday == other.Monday && Tuesday == other.Tuesday && Wednesday == other.Wednesday && Thursday == other.Thursday && Friday == other.Friday && Saturday == other.Saturday && Sunday == other.Sunday;
