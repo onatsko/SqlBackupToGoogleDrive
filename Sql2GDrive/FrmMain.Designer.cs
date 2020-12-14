@@ -129,6 +129,7 @@
             this.tsbJobEdit.Name = "tsbJobEdit";
             this.tsbJobEdit.Size = new System.Drawing.Size(23, 22);
             this.tsbJobEdit.Text = "Edit";
+            this.tsbJobEdit.Click += new System.EventHandler(this.tsbJobEdit_Click);
             // 
             // tsbJobDelete
             // 
@@ -138,6 +139,7 @@
             this.tsbJobDelete.Name = "tsbJobDelete";
             this.tsbJobDelete.Size = new System.Drawing.Size(23, 22);
             this.tsbJobDelete.Text = "Delete";
+            this.tsbJobDelete.Click += new System.EventHandler(this.tsbJobDelete_Click);
             // 
             // btnGoogleAuthorize
             // 

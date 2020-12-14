@@ -2,6 +2,8 @@
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using Microsoft.EntityFrameworkCore;
+using Sql2GoogleDrive.DAL;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,11 +11,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Sql2GoogleDrive.DAL;
-using Timer = System.Threading.Timer;
 
 namespace Sql2GDrive
 {
@@ -39,6 +37,35 @@ namespace Sql2GDrive
             timer1.Start();
         }
 
+        private void ClearJobDetailControls()
+        {
+            _job = null;
+
+            txtJobName.Text = "";
+
+            txtConServer.Text = "";
+            txtConDatabase.Text = "";
+            txtConLogin.Text = "";
+            txtConPassword.Text = "";
+
+            chbSaveToFolder.Checked = false;
+            txtFolder.Text = "";
+
+            rdbConAuthSql.Checked = false;
+            rdbConAuthWin.Checked = false;
+
+            rdbAutorunModeAuto.Checked = false;
+            rdbAutorunModeNone.Checked = false;
+
+            chbMonday.Checked = false;
+            chbTuesday.Checked = false;
+            chbWednesday.Checked = false;
+            chbThursday.Checked = false;
+            chbFriday.Checked = false;
+            chbSaturday.Checked = false;
+            chbSunday.Checked = false;
+        }
+
         private void EnableDisableJobDetailControls(bool state)
         {
             txtJobName.Enabled = state;
@@ -58,8 +85,8 @@ namespace Sql2GDrive
 
             btnJobSave.Enabled = state;
 
-            btnBackupAndUpload.Enabled = state;
-            btnBackupOnly.Enabled = state;
+            //btnBackupAndUpload.Enabled = state;
+            //btnBackupOnly.Enabled = state;
 
         }
 
@@ -134,6 +161,13 @@ namespace Sql2GDrive
                 {
                     dgvJobList.DataSource = jobs;
                 }
+                else
+                {
+                    ClearJobDetailControls();
+                    EnableDisableJobDetailControls(false);
+                    btnBackupAndUpload.Enabled = false;
+                    btnBackupOnly.Enabled = false;
+                }
             }
         }
 
@@ -170,6 +204,9 @@ namespace Sql2GDrive
             GetJobs();
             SetJobSelectedInList(job.Id);
 
+            EnableDisableJobDetailControls(true);
+
+
             _isLoadingData = false;
         }
 
@@ -180,6 +217,7 @@ namespace Sql2GDrive
                 if ((int)dgvJobList["Id", i].Value == jobId)
                 {
                     dgvJobList.CurrentCell = dgvJobList["id", i];
+                    dgvJobList_SelectionChanged(null, null);
                     break;
                 }
             }
@@ -423,6 +461,9 @@ namespace Sql2GDrive
 
 
             var jobInDb = GetJobFullFromDb(_job.Id);
+            
+            if (jobInDb.IsDel)
+                return true;
 
             if (!jobInDb.Equals(_job))
             {
@@ -450,6 +491,9 @@ namespace Sql2GDrive
         private void dgvJobList_SelectionChanged(object sender, EventArgs e)
         {
             EnableDisableJobDetailControls(false);
+            btnBackupAndUpload.Enabled = false;
+            btnBackupOnly.Enabled = false;
+
             if (dgvJobList.CurrentCellAddress.Y < 0)
                 return;
 
@@ -472,7 +516,7 @@ namespace Sql2GDrive
 
         private void FillData()
         {
-            EnableDisableJobDetailControls(true);
+            //EnableDisableJobDetailControls(true);
 
             txtJobName.Text = _job.Name;
 
@@ -539,6 +583,8 @@ namespace Sql2GDrive
             }
             SetControlAccessRunMode();
 
+            btnBackupAndUpload.Enabled = true;
+            btnBackupOnly.Enabled = true;
         }
 
         private void SetControlAccessRunMode()
@@ -897,6 +943,42 @@ namespace Sql2GDrive
         private void btnRunTimeDelete_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void tsbJobEdit_Click(object sender, EventArgs e)
+        {
+            if (dgvJobList.CurrentCellAddress.Y < 0)
+                return;
+
+            EnableDisableJobDetailControls(true);
+        }
+
+        private void tsbJobDelete_Click(object sender, EventArgs e)
+        {
+            if (dgvJobList.CurrentCellAddress.Y < 0)
+                return;
+
+            var result =
+                MessageBox.Show(
+                    $"Do you want to delete job '{dgvJobList["Name", dgvJobList.CurrentCellAddress.Y].Value}'?",
+                    Program.AppName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+                return;
+
+            var jobId = (int)dgvJobList["Id", dgvJobList.CurrentCellAddress.Y].Value;
+
+            using (var db = new JobContext())
+            {
+                var job = db.Jobs.Where(x => x.Id == jobId).FirstOrDefault();
+                if (job != null)
+                {
+                    job.IsDel = true;
+                    db.SaveChanges();
+                }
+            }
+
+            GetJobs();
         }
     }
 
