@@ -2,8 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <Authors>Onatsko Dmitry</Authors>
+    <Company>Onatsko Dmitry</Company>
+    <Copyright>(c) Onatsko Dmitry, 2020</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
