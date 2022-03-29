@@ -356,7 +356,7 @@ namespace Sql2GDrive
                 return;
             }
 
-            RunJob(_job);
+            RunJob_new(_job);
         }
 
         private void RunJob(Job job)
@@ -388,6 +388,39 @@ namespace Sql2GDrive
             //);
 
         //tProgressThread.Start();
+
+
+        }
+
+        private void RunJob_new(Job job)
+        {
+            // var tProgressThread = new Thread(() =>
+            //Task.Run(() =>
+            // {
+            var frmDo = new FrmBackupAndUpload(
+                job.Connection.Server, //txtConServer.Text,
+                job.Connection.Database, //txtConDatabase.Text,
+                job.Connection.AuthWindows, //rdbConAuthWin.Checked,
+                job.Connection.AuthSql
+                    ? _job.Connection.Login
+                    : "", //(rdbConAuthSql.Checked ? txtConLogin.Text : ""),
+                job.Connection.AuthSql
+                    ? _job.Connection.Password
+                    : "", //(rdbConAuthSql.Checked ? txtConPassword.Text : ""),
+                true,
+                true,
+                true,
+                job.Connection.Database, //txtConDatabase.Text.ToUpper(),
+                !job.IsSaveToLocalFolder, //!chbSaveToFolder.Checked,
+                job.IsSaveToLocalFolder ? job.FolderPath : "", //chbSaveToFolder.Checked ? txtFolder.Text : "",
+                true
+            );
+            frmDo.Show();
+            frmDo.Run();
+            //}
+            //);
+
+            //tProgressThread.Start();
 
 
         }
