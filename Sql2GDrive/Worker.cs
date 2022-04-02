@@ -317,7 +317,7 @@ public class Worker
 
     private void DisplayUploadFileProgress(int uploadingPercent)
     {
-        WorkerProgressChanged(this, new WorkerProgressChangedArgs($"Backup process {uploadingPercent}% completed (2/2)", 100 + uploadingPercent));
+        WorkerProgressChanged(this, new WorkerProgressChangedArgs($"Upload process {uploadingPercent}% completed (2/2)", 100 + uploadingPercent));
     }
 
 }
